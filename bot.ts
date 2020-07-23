@@ -74,14 +74,15 @@ function SortByPercentile(rawData: Array<any>) {
 
 function SlicedBySpec(rawData: Array<Array<outputLayout>>) {
 	let specList:Array<string> = []
-	let output:Array<any> = []
+	let output:Array<Array<outputLayout>> = []
 	
 	for( const data of rawData){
 		specList = []
-		for(const e of data) {
-			if (!(specList.find(val => val === e.spec))) {
-				specList.push(e.spec)
-				output.push(e)
+		output.push([])
+		for (let i: number = 0 ; i < data.length ; i += 1) {
+			if (!(specList.find(val => val === data[i].spec))) {
+				specList.push(data[i].spec)
+				output[output.length - 1].push(data[i])
 			}
 		}
 	}
@@ -90,8 +91,16 @@ function SlicedBySpec(rawData: Array<Array<outputLayout>>) {
 
 
 async function ParseEdenGate(serverName : string, charName : string) {
-	let getData : Array<outputLayout>
-	let output : string = ""	
+
+	const encounter :{[key:number]: string} = {
+		65 : "Eden Prime",
+		66 : "Voidwalker",
+		67 : "Leviathan",
+		68 : "Titan"
+	}
+	let getData : Array<Array<outputLayout>>
+	let output : string = ""
+	const temp :string = "asdf"
 	async function querTest(serverName : string, charName : string) {
 		const url = `https://www.fflogs.com:443/v1/parses/character/${encodeURI(charName)}/${serverName}/KR`
 
@@ -106,24 +115,28 @@ async function ParseEdenGate(serverName : string, charName : string) {
 
 		}
 			let chec = JSON.parse((await request(query)))
+
 			return chec
 	}
 	
 	getData = SlicedBySpec(SlicingByLayer(await querTest(serverName, charName)))
-	console.log(getData)
-
+	for (const e of getData) {
+		output += ("> **"+encounter[e[0].encounterID] + "** \n")
+		for (const d of e) {
+			output += ("> \t" + job[d.spec] + " : " + d.percentile + "\n")
+		}
+	}
+	console.log(output)
 	return output
-
-	
 
 }
 
-client.on('message', (message)=> {
+client.on('message', async (message)=> {
 	console.log(message.content)
 	let msg: string[] = message.content.split(" ")
 	 console.log(msg[0])
-	if (msg[0] == ";ffeg") {
-		let output = ParseEdenGate(server[msg[1]], msg[2])
+	if (msg[0] == "/ffeg") {
+		message.channel.send(await ParseEdenGate(server[msg[1]], msg[2]))
 	}
 })
 
