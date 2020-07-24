@@ -35,6 +35,17 @@ interface outputLayout {
 
 }
 
+function sortByPercentile(rawData: Array<Array<outputLayout>>):Array<Array<outputLayout>> {
+	let out :Array<Array<outputLayout>> = []
+	for (let e of rawData) {
+		e.sort((function (a, b) { 
+			return a.percentile < b.percentile ? 1 : a.percentile > b.percentile ? -1 : 0;  
+		}))
+		out.push(e)
+	}
+	return out
+}
+
 function SlicingByLayer(rawData: Array<any>):Array<Array<outputLayout>> {
 	let layer:Array<outputLayout> = []
 	let encounterIDList: Array<number> = []
@@ -63,7 +74,7 @@ function SlicingByLayer(rawData: Array<any>):Array<Array<outputLayout>> {
 function SlicedBySpec(rawData: Array<Array<outputLayout>>) {
 	let specList:Array<string> = []
 	let output:Array<Array<outputLayout>> = []
-	
+	rawData = sortByPercentile(rawData)
 	for( const data of rawData){
 		specList = []
 		output.push([])
