@@ -26,4 +26,7 @@
 
 ### 4. Special thanks 
 * 에탈 / 모그리
-* [히비야 / 카벙클](github.com/hibiyasleep) 
+* [히비야 / 카벙클](http://github.com/hibiyasleep) 
+
+### 5. License
+* GPLv3
