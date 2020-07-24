@@ -78,7 +78,56 @@ function SlicedBySpec(rawData: Array<Array<outputLayout>>) {
 }
 
 async function ParseUltimateAlexander(serverName : string, charName : string) {
+	const parseTier:Array<string> = ['(회딱)', '(초딱)', '(파딱)', '(보딱)', '(주딱)', '(핑딱)', '(노딱)']
+	let output : string = `\`\'${charName}\'\`의 \`\'절 알렉산더\'\` 기록\n`
+	let getData : Array<Array<outputLayout>>
+	const encounter :{[key:number]: string} = {
+		1050 : "The Epic of Alexander"
+	}
 
+	async function querTest(serverName : string, charName : string) {
+		const url = `https://www.fflogs.com:443/v1/parses/character/${encodeURI(charName)}/${serverName}/KR`
+		const query = {
+			uri: url,
+			qs : {
+				'api_key' : config.FF_KEY,
+				'metric' : "rdps",
+				'zone' : 32,
+				'timeframe' : 'historical'
+			}
+		}
+		return JSON.parse((await request(query)))
+	}
+
+	if (Object.keys(server).find(e => e === serverName)){
+		serverName = server[serverName]
+		getData = SlicedBySpec(SlicingByLayer(await querTest(serverName, charName)))
+		for (const e of getData) {
+			output += ("> **"+encounter[e[0].encounterID] + "** \n")
+			for (const d of e) {
+				let tier: string = ""
+				if (d.percentile < 25)
+					tier = parseTier[0];
+				else if (d.percentile < 50)
+					tier = parseTier[1]
+				else if (d.percentile < 75)
+					tier =  parseTier[2]
+				else if (d.percentile < 95)
+					tier =  parseTier[3]
+				else if (d.percentile < 99)
+					tier =  parseTier[4]
+				else if (d.percentile < 100)
+					tier =  parseTier[5]
+				else 
+					tier =  parseTier[6]
+				output += ("> \t\`" + job[d.spec] + " : " + (Math.floor(d.percentile * 100)/100) + tier + "\`\n")
+			}
+		}
+	} else {
+		output = "ERR : 서버명에 문제가 있습니다."
+	}
+	console.log(output)
+	return output
 }
 
 async function ParseEdenGate(serverName : string, charName : string) {
@@ -91,8 +140,7 @@ async function ParseEdenGate(serverName : string, charName : string) {
 	}
 	const parseTier:Array<string> = ['(회딱)', '(초딱)', '(파딱)', '(보딱)', '(주딱)', '(핑딱)', '(노딱)']
 	let getData : Array<Array<outputLayout>>
-	let output : string = `\`${charName}\`의 Eden's Gate 기록\n`
-	let flag : boolean = false
+	let output : string = `\`\'${charName}\'\`의 \`\'Eden's Gate\'\` 기록\n`
 
 	async function querTest(serverName : string, charName : string) {
 		const url = `https://www.fflogs.com:443/v1/parses/character/${encodeURI(charName)}/${serverName}/KR`
@@ -130,7 +178,7 @@ async function ParseEdenGate(serverName : string, charName : string) {
 					tier =  parseTier[5]
 				else 
 					tier =  parseTier[6]
-				output += ("> \t" + job[d.spec] + " : \`" + (Math.floor(d.percentile * 100)/100) + tier + "\`\n")
+				output += ("> \t\`" + job[d.spec] + " : " + (Math.floor(d.percentile * 100)/100) + tier + "\`\n")
 			}
 		}
 	} else {
@@ -148,6 +196,14 @@ client.on('message', async (message)=> {
 	if (msg[0] == "/ffeg") {
 		message.channel.send(await ParseEdenGate(msg[1], msg[2]))
 	}
-})
+	else if (msg[0] == "/ffua") {
+		message.channel.send(await ParseUltimateAlexander(msg[1], msg[2]))
+	}
+	else if (msg[0] == "/ff") {
+		message.channel.send(await ParseEdenGate(msg[1], msg[2]))
+		message.channel.send(await ParseUltimateAlexander(msg[1], msg[2]))
+	}	
+}
+)
 
 client.login(config.DISCORD_KEY)
