@@ -26,4 +26,4 @@
 
 ### 4. Special thanks 
 * 에탈 / 모그리
-* 히비야 / 카벙클
+* [히비야 / 카벙클](github.com/hibiyasleep) 
