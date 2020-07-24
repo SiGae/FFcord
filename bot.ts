@@ -9,7 +9,25 @@ const server:{[key:string]: string} = {
 	'카벙클' : 'carbuncle',
 	'톤베리' : 'tonberry'
 }
-
+const job:{[key:string]: string} = {
+	"Astrologian" : "점성술사",
+	"Bard" : "음유시인",
+	"Black Mage" : "흑마도사",
+	"Dark Knight" : "암흑기사",
+	"Dragoon" : "용기사",
+	"Machinist" : "기공사",
+	"Monk" : "몽크",
+	"Ninja" : "닌자",
+	"Paladin" : "나이트",
+	"Scholar" : "학자",
+	"Summoner" : "소환사",
+	"Warrior" : "전사",
+	"White Mage" : "백마도사",
+	"Red Mage" : "적마도사",
+	"Samurai" : "사무라이",
+	"Dancer" : "무도가",
+	"Gunbreaker" : "건브레이커"
+}
 interface outputLayout {
 	encounterID:number;
 	spec:string;
@@ -42,13 +60,6 @@ function SlicingByLayer(rawData: Array<any>):Array<Array<outputLayout>> {
 	return output
 }
 
-function SortByPercentile(rawData: Array<any>) {
-	let output:Array<outputLayout> = []
-	for(const e of rawData) {
-		console.log(e.spec)
-	}
-}
-
 function SlicedBySpec(rawData: Array<Array<outputLayout>>) {
 	let specList:Array<string> = []
 	let output:Array<Array<outputLayout>> = []
@@ -66,28 +77,12 @@ function SlicedBySpec(rawData: Array<Array<outputLayout>>) {
 	return output
 }
 
+async function ParseUltimateAlexander(serverName : string, charName : string) {
+
+}
 
 async function ParseEdenGate(serverName : string, charName : string) {
 
-	const job:{[key:string]: string} = {
-		"Astrologian" : "점성술사",
-		"Bard" : "음유시인",
-		"Black Mage" : "흑마도사",
-		"Dark Knight" : "암흑기사",
-		"Dragoon" : "용기사",
-		"Machinist" : "기공사",
-		"Monk" : "몽크",
-		"Ninja" : "닌자",
-		"Paladin" : "나이트",
-		"Scholar" : "학자",
-		"Summoner" : "소환사",
-		"Warrior" : "전사",
-		"White Mage" : "백마도사",
-		"Red Mage" : "적마도사",
-		"Samurai" : "사무라이",
-		"Dancer" : "무도가",
-		"Gunbreaker" : "건브레이커"
-	}
 	const encounter :{[key:number]: string} = {
 		65 : "Eden Prime",
 		66 : "Voidwalker",
@@ -101,7 +96,6 @@ async function ParseEdenGate(serverName : string, charName : string) {
 
 	async function querTest(serverName : string, charName : string) {
 		const url = `https://www.fflogs.com:443/v1/parses/character/${encodeURI(charName)}/${serverName}/KR`
-
 		const query = {
 			uri: url,
 			qs : {
@@ -110,11 +104,8 @@ async function ParseEdenGate(serverName : string, charName : string) {
 				'zone' : 29,
 				'timeframe' : 'historical'
 			}
-
 		}
-			let chec = JSON.parse((await request(query)))
-
-			return chec
+		return JSON.parse((await request(query)))
 	}
 
 
