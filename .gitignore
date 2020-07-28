@@ -1,3 +1,4 @@
 node_modules
 config.ts
 .DS_Store
+.vscode
