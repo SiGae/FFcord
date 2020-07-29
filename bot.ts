@@ -35,7 +35,7 @@ interface outputLayout {
 }
 
 const percentileSortFn = (a: outputLayout, b: outputLayout) =>
-  a.percentile - b.percentile;
+  b.percentile - a.percentile;
 
 const sortByPercentile = (rawData: outputLayout[][]) =>
   rawData.map((item) => {
