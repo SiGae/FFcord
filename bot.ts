@@ -3,6 +3,7 @@ import request from 'request-promise-native';
 import config from './config';
 
 const client = new Discord.Client();
+
 const server: {[key: string]: string} = {
   모그리: 'moogle',
   초코보: 'chocobo',
@@ -28,25 +29,26 @@ const job: {[key: string]: string} = {
   Dancer: '무도가',
   Gunbreaker: '건브레이커',
 };
-interface outputLayout {
+
+type ExtractLayout = {
   encounterID: number;
   spec: string;
   percentile: number;
-}
+};
 
-const percentileSortFn = (a: outputLayout, b: outputLayout) =>
+const percentileSortFn = (a: ExtractLayout, b: ExtractLayout) =>
   b.percentile - a.percentile;
 
-const sortByPercentile = (rawData: outputLayout[][]) =>
+const sortByPercentile = (rawData: ExtractLayout[][]) =>
   rawData.map((item) => {
     item.sort(percentileSortFn);
     return item;
   });
 
-function SlicingByLayer(rawData: Array<any>): Array<Array<outputLayout>> {
-  const layer: Array<outputLayout> = [];
-  const encounterIDList: Array<number> = [];
-  const output: Array<Array<outputLayout>> = [];
+function SlicingByLayer(rawData: Array<any>): ExtractLayout[][] {
+  const layer: ExtractLayout[] = [];
+  const encounterIDList: number[] = [];
+  const output: ExtractLayout[][] = [];
   let cnt: number = -1;
   rawData.forEach((i) => {
     if (i.difficulty === 101 || i.encounterID === 1050) {
@@ -69,10 +71,10 @@ function SlicingByLayer(rawData: Array<any>): Array<Array<outputLayout>> {
   return output;
 }
 
-function SlicedBySpec(rawData: Array<Array<outputLayout>>) {
-  let specList: Array<string> = [];
-  const output: Array<Array<outputLayout>> = [];
-  const sortData: outputLayout[][] = sortByPercentile(rawData);
+function SlicedBySpec(rawData: ExtractLayout[][]) {
+  let specList: string[] = [];
+  const output: ExtractLayout[][] = [];
+  const sortData: ExtractLayout[][] = sortByPercentile(rawData);
 
   sortData.forEach((data) => {
     specList = [];
@@ -88,7 +90,7 @@ function SlicedBySpec(rawData: Array<Array<outputLayout>>) {
   return output;
 }
 
-async function querTest(
+async function QueryHistorical(
   serverNameENG: string,
   charNameENG: string,
   flag: number
@@ -108,8 +110,32 @@ async function querTest(
   return JSON.parse(await request(query));
 }
 
-async function RankMarker(serverName: string, charName: string, flag: number) {
-  const parseTier: Array<string> = [
+async function QueryToday(
+  serverNameENG: string,
+  charNameENG: string,
+  flag: number
+) {
+  const url = `https://www.fflogs.com:443/v1/parses/character/${encodeURI(
+    charNameENG
+  )}/${serverNameENG}/KR`;
+  const query = {
+    uri: url,
+    qs: {
+      api_key: config.FF_KEY,
+      metric: 'rdps',
+      zone: flag,
+    },
+  };
+  return JSON.parse(await request(query));
+}
+
+async function RankMarker(
+  serverName: string,
+  charName: string,
+  flag: number,
+  CheckMethod: boolean
+) {
+  const parseTier: string[] = [
     '(회딱)',
     '(초딱)',
     '(파딱)',
@@ -128,8 +154,12 @@ async function RankMarker(serverName: string, charName: string, flag: number) {
 
   let output: string = '';
   if (Object.keys(server).find((e) => e === serverName)) {
-    const getData: outputLayout[][] = SlicedBySpec(
-      SlicingByLayer(await querTest(server[serverName], charName, flag))
+    const getData: ExtractLayout[][] = SlicedBySpec(
+      SlicingByLayer(
+        CheckMethod
+          ? await QueryHistorical(server[serverName], charName, flag)
+          : await QueryToday(server[serverName], charName, flag)
+      )
     );
 
     getData.forEach((e) => {
@@ -172,28 +202,49 @@ async function RankMarker(serverName: string, charName: string, flag: number) {
   return output;
 }
 
-async function ParseUltimateAlexander(serverName: string, charName: string) {
+async function ParseUltimateAlexander(
+  serverName: string,
+  charName: string,
+  CheckMethod: boolean
+) {
   const output: string = `\`'${charName}'\`의 \`'절 알렉산더'\` 기록\n`;
 
-  return output + (await RankMarker(serverName, charName, 32));
+  return output + (await RankMarker(serverName, charName, 32, CheckMethod));
 }
 
-async function ParseEdenGate(serverName: string, charName: string) {
+async function ParseEdenGate(
+  serverName: string,
+  charName: string,
+  CheckMethod: boolean
+) {
   const output: string = `\`'${charName}'\`의 \`'Eden's Gate'\` 기록\n`;
-  return output + (await RankMarker(serverName, charName, 29));
+  return output + (await RankMarker(serverName, charName, 29, CheckMethod));
 }
 
 client.on('message', async (message) => {
   console.log(message.content);
   const msg: string[] = message.content.split(' ');
   console.log(msg[0]);
-  if (msg[0] === '/ffeg') {
-    message.channel.send(await ParseEdenGate(msg[1], msg[2]));
-  } else if (msg[0] === '/ffua') {
-    message.channel.send(await ParseUltimateAlexander(msg[1], msg[2]));
-  } else if (msg[0] === '/ff') {
-    message.channel.send(await ParseEdenGate(msg[1], msg[2]));
-    message.channel.send(await ParseUltimateAlexander(msg[1], msg[2]));
+
+  if (msg.length === 4 && msg[3] === '-t') {
+    console.log('beep');
+    if (msg[0] === '/ffeg') {
+      message.channel.send(await ParseEdenGate(msg[1], msg[2], false));
+    } else if (msg[0] === '/ffua') {
+      message.channel.send(await ParseUltimateAlexander(msg[1], msg[2], false));
+    } else if (msg[0] === '/ff') {
+      message.channel.send(await ParseEdenGate(msg[1], msg[2], false));
+      message.channel.send(await ParseUltimateAlexander(msg[1], msg[2], false));
+    }
+  } else if (msg.length === 3) {
+    if (msg[0] === '/ffeg') {
+      message.channel.send(await ParseEdenGate(msg[1], msg[2], true));
+    } else if (msg[0] === '/ffua') {
+      message.channel.send(await ParseUltimateAlexander(msg[1], msg[2], true));
+    } else if (msg[0] === '/ff') {
+      message.channel.send(await ParseEdenGate(msg[1], msg[2], true));
+      message.channel.send(await ParseUltimateAlexander(msg[1], msg[2], true));
+    }
   }
 });
 
