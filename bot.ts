@@ -1,5 +1,5 @@
 import Discord from 'discord.js';
-import request from 'request-promise-native';
+import axios from 'axios';
 import config from './config';
 
 const client = new Discord.Client();
@@ -98,16 +98,16 @@ async function QueryHistorical(
   const url = `https://www.fflogs.com:443/v1/parses/character/${encodeURI(
     charNameENG
   )}/${serverNameENG}/KR`;
-  const query = {
-    uri: url,
-    qs: {
-      api_key: config.FF_KEY,
-      metric: 'rdps',
-      zone: flag,
-      timeframe: 'historical',
-    },
-  };
-  return JSON.parse(await request(query));
+  return (
+    await axios.get(url, {
+      params: {
+        api_key: config.FF_KEY,
+        metric: 'rdps',
+        zone: flag,
+        timeframe: 'historical',
+      },
+    })
+  ).data;
 }
 
 async function QueryToday(
@@ -118,15 +118,15 @@ async function QueryToday(
   const url = `https://www.fflogs.com:443/v1/parses/character/${encodeURI(
     charNameENG
   )}/${serverNameENG}/KR`;
-  const query = {
-    uri: url,
-    qs: {
-      api_key: config.FF_KEY,
-      metric: 'rdps',
-      zone: flag,
-    },
-  };
-  return JSON.parse(await request(query));
+  return (
+    await axios.get(url, {
+      params: {
+        api_key: config.FF_KEY,
+        metric: 'rdps',
+        zone: flag,
+      },
+    })
+  ).data;
 }
 
 async function RankMarker(

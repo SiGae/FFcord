@@ -25,7 +25,7 @@
 - ts-node
 - discord.js
 - @types/request
-- @types/request-promise-native
+- axios
 
 ### 4. Special thanks
 
