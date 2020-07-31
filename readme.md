@@ -7,17 +7,33 @@
 
 ### 2. 명령어
 
-- 각영, 절 알렉산더 데이터 출력
+- #### Parse by historical
 
-  `/ff serverName characterName`
+  - ##### 각영, 절 알렉산더 데이터 출력
 
-- 각영 데이터 출력
+    `/ff serverName characterName`
 
-  `/ffeg serverName characterName`
+  - ##### 각영 데이터 출력
 
-- 절 알렉산더 데이터 출력
+    `/ffeg serverName characterName`
 
-  `/ffua serverName characterName`
+  - ##### 절 알렉산더 데이터 출력
+
+    `/ffua serverName characterName`
+
+- #### Parse by Today
+
+  - ##### 각영, 절 알렉산더 데이터 출력
+
+    `/ff serverName characterName -t`
+
+  - ##### 각영 데이터 출력
+
+    `/ffeg serverName characterName -t`
+
+  - ##### 절 알렉산더 데이터 출력
+
+    `/ffua serverName characterName -t`
 
 ### 3. Requirement
 
