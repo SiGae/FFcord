@@ -93,10 +93,10 @@ function SlicedBySpec(rawData: ExtractLayout[][]) {
 async function QueryHistorical(
   serverNameENG: string,
   charNameENG: string,
-  flag: number
+  flag: number,
 ) {
   const url = `https://www.fflogs.com:443/v1/parses/character/${encodeURI(
-    charNameENG
+    charNameENG,
   )}/${serverNameENG}/KR`;
   return (
     await axios.get(url, {
@@ -113,10 +113,10 @@ async function QueryHistorical(
 async function QueryToday(
   serverNameENG: string,
   charNameENG: string,
-  flag: number
+  flag: number,
 ) {
   const url = `https://www.fflogs.com:443/v1/parses/character/${encodeURI(
-    charNameENG
+    charNameENG,
   )}/${serverNameENG}/KR`;
   return (
     await axios.get(url, {
@@ -133,7 +133,7 @@ async function RankMarker(
   serverName: string,
   charName: string,
   flag: number,
-  CheckMethod: boolean
+  CheckMethod: boolean,
 ) {
   const parseTier: string[] = [
     '(회딱)',
@@ -158,8 +158,8 @@ async function RankMarker(
       SlicingByLayer(
         CheckMethod
           ? await QueryHistorical(server[serverName], charName, flag)
-          : await QueryToday(server[serverName], charName, flag)
-      )
+          : await QueryToday(server[serverName], charName, flag),
+      ),
     );
 
     getData.forEach((e) => {
@@ -205,7 +205,7 @@ async function RankMarker(
 async function ParseUltimateAlexander(
   serverName: string,
   charName: string,
-  CheckMethod: boolean
+  CheckMethod: boolean,
 ) {
   const output: string = `\`'${charName}'\`의 \`'절 알렉산더'\` 기록\n`;
 
@@ -215,10 +215,19 @@ async function ParseUltimateAlexander(
 async function ParseEdenGate(
   serverName: string,
   charName: string,
-  CheckMethod: boolean
+  CheckMethod: boolean,
 ) {
   const output: string = `\`'${charName}'\`의 \`'Eden's Gate'\` 기록\n`;
   return output + (await RankMarker(serverName, charName, 29, CheckMethod));
+}
+
+async function ParseEdenVerse(
+  serverName: string,
+  charName: string,
+  CheckMethod: boolean,
+) {
+  const output: string = `\`'${charName}'\`의 \`'Eden's Verse'\` 기록\n`;
+  return output + (await RankMarker(serverName, charName, 33, CheckMethod));
 }
 
 client.on('message', async (message) => {
@@ -232,6 +241,8 @@ client.on('message', async (message) => {
       message.channel.send(await ParseEdenGate(msg[1], msg[2], false));
     } else if (msg[0] === '/ffua') {
       message.channel.send(await ParseUltimateAlexander(msg[1], msg[2], false));
+    } else if (msg[0] === '/ffev') {
+      message.channel.send(await ParseEdenVerse(msg[1], msg[2], false));
     } else if (msg[0] === '/ff') {
       message.channel.send(await ParseEdenGate(msg[1], msg[2], false));
       message.channel.send(await ParseUltimateAlexander(msg[1], msg[2], false));
@@ -241,6 +252,8 @@ client.on('message', async (message) => {
       message.channel.send(await ParseEdenGate(msg[1], msg[2], true));
     } else if (msg[0] === '/ffua') {
       message.channel.send(await ParseUltimateAlexander(msg[1], msg[2], true));
+    } else if (msg[0] === '/ffev') {
+      message.channel.send(await ParseEdenVerse(msg[1], msg[2], true));
     } else if (msg[0] === '/ff') {
       message.channel.send(await ParseEdenGate(msg[1], msg[2], true));
       message.channel.send(await ParseUltimateAlexander(msg[1], msg[2], true));
