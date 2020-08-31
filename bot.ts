@@ -245,6 +245,7 @@ client.on('message', async (message) => {
       message.channel.send(await ParseEdenVerse(msg[1], msg[2], false));
     } else if (msg[0] === '/ff') {
       message.channel.send(await ParseEdenGate(msg[1], msg[2], false));
+      message.channel.send(await ParseEdenVerse(msg[1], msg[2], false));
       message.channel.send(await ParseUltimateAlexander(msg[1], msg[2], false));
     }
   } else if (msg.length === 3) {
@@ -256,6 +257,7 @@ client.on('message', async (message) => {
       message.channel.send(await ParseEdenVerse(msg[1], msg[2], true));
     } else if (msg[0] === '/ff') {
       message.channel.send(await ParseEdenGate(msg[1], msg[2], true));
+      message.channel.send(await ParseEdenVerse(msg[1], msg[2], true));
       message.channel.send(await ParseUltimateAlexander(msg[1], msg[2], true));
     }
   }
