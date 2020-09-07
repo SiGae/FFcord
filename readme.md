@@ -17,6 +17,10 @@
 
     `/ffeg serverName characterName`
 
+  - ##### 공명 데이터 출력
+
+    `/ffev serverName characterName`
+
   - ##### 절 알렉산더 데이터 출력
 
     `/ffua serverName characterName`
@@ -30,6 +34,10 @@
   - ##### 각영 데이터 출력
 
     `/ffeg serverName characterName -t`
+
+  - ##### 공명 데이터 출력
+
+    `/ffev serverName characterName -t`
 
   - ##### 절 알렉산더 데이터 출력
 

@@ -149,6 +149,10 @@ async function RankMarker(
     66: 'Voidwalker',
     67: 'Leviathan',
     68: 'Titan',
+    69: 'Ramuh',
+    70: 'Ifrit and Garuda',
+    71: 'The Idol of Darkness',
+    72: 'Shiva',
     1050: 'The Epic of Alexander',
   };
 
